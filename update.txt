@@ -1,0 +1,157 @@
+Here's a complete context document you can paste at the start of any new chat:
+
+---
+
+**PROJECT: InnovateFeed — Role-Aware AI Innovation Discovery Platform**
+
+**What it is:**
+An AI-powered platform that automatically pulls research papers, technical news, and project ideas, then converts them into structured, personalized summaries and buildable project blueprints for students. It's not a chatbot — it's a proactive innovation feed.
+
+**Core Novelty:**
+1. Role-aware personalization — content depth adapts based on user's designation (school/college/professional), skill level, and interests
+2. Research-to-project translation — papers get converted into simplified explanation + project idea + tech stack + roadmap + difficulty score
+3. Structured multi-layer summaries — every paper gets a 1-min overview, 5-min breakdown, and deep dive
+4. Semantic search using embeddings — user profile is vectorized and matched against paper embeddings via vector similarity
+5. Mini Connect feature — users interested in the same paper/project can find each other and form build teams
+
+**Data Sources:** arXiv (research papers), GitHub Trending, Hacker News, Product Hunt
+
+**Team:** 3 people
+- Person A: Backend + Data Pipeline (arXiv ingestion, PostgreSQL, FastAPI, cron jobs)
+- Person B: AI Layer (embeddings, Qdrant vector search, LLM summarization, personalization)
+- Person C: Frontend (Next.js, feed UI, profile pages, Connect feature UI)
+
+**Goal:** Full-featured semester/college project with all features including Connect
+
+---
+
+**TECH STACK:**
+- Backend: FastAPI (Python)
+- Database: PostgreSQL hosted on Supabase
+- Vector DB: Qdrant (for storing and searching paper embeddings)
+- Embeddings: sentence-transformers (all-MiniLM-L6-v2, runs locally, free)
+- LLM: OpenAI GPT (API key ready)
+- Frontend: Next.js (App Router)
+- OS: Windows, using PowerShell
+
+---
+
+**WHAT HAS BEEN BUILT SO FAR:**
+
+1. ✅ Full folder structure created:
+```
+backend/
+  app/
+    api/routes/     (papers.py, users.py, feed.py)
+    core/           (config.py)
+    db/             (database.py, models.py)
+    ingestion/      (arxiv_fetcher.py)
+    ai/             (embedder.py, summarizer.py, searcher.py)
+    main.py
+  .env
+  requirements.txt
+frontend/           (empty, Next.js to be initialized)
+```
+
+2. ✅ FastAPI server running with 3 route groups: /papers, /users, /feed
+
+3. ✅ Supabase PostgreSQL connected (session pooler connection, IPv4 compatible)
+
+4. ✅ All 4 database tables created via SQLAlchemy models:
+- `users` — id, name, email, designation, skill_level, interests (array), created_at
+- `papers` — id, arxiv_id, title, authors, abstract, source_url, published_date, field, difficulty_score, summary_one_min, summary_five_min, summary_deep, build_ideas, suggested_stack, estimated_build_time, embedding_id, created_at
+- `saved_papers` — user_id, paper_id (bookmark feature)
+- `connect_requests` — user_id, paper_id, message, status (open/matched/closed)
+
+5. ✅ arXiv fetcher written (arxiv_fetcher.py) — fetches real papers by field using arXiv public API, parses XML response, returns structured paper data. Supports fields: AI, Web Dev, Robotics, Cybersecurity, Data Science, Blockchain
+
+6. ✅ Test route added: GET /papers/fetch/{field} — returns live arXiv papers as JSON
+
+**Key files and their current content:**
+
+`backend/app/core/config.py` — Settings class using pydantic-settings, reads from .env, has DATABASE_URL, QDRANT_URL, LLM_PROVIDER, OPENAI_API_KEY, EMBEDDING_MODEL
+
+`backend/app/db/database.py` — SQLAlchemy engine, SessionLocal, Base, get_db() dependency
+
+`backend/app/db/models.py` — All 4 SQLAlchemy models (User, Paper, SavedPaper, ConnectRequest)
+
+`backend/app/main.py` — FastAPI app with CORS, 3 routers included, Base.metadata.create_all() on startup
+
+`backend/app/ingestion/arxiv_fetcher.py` — async fetch_papers(field, max_results), parse_arxiv_response() using XML parsing
+
+`backend/app/api/routes/papers.py` — GET / and GET /fetch/{field} routes
+
+---
+
+**WHAT NEEDS TO BE BUILT NEXT (in order):**
+
+**Phase 2 — Save papers to DB**
+- After fetching from arXiv, store papers in PostgreSQL
+- Add POST /papers/ingest/{field} endpoint
+- Check for duplicates using arxiv_id before inserting
+
+**Phase 3 — Embeddings + Qdrant**
+- Set up Qdrant (run locally via Docker or use Qdrant Cloud free tier)
+- Write embedder.py using sentence-transformers (all-MiniLM-L6-v2)
+- Generate embedding for each paper's title + abstract
+- Store embedding in Qdrant with paper's UUID as payload
+- Store embedding_id back in PostgreSQL papers table
+
+**Phase 4 — User Profile System**
+- POST /users/create — create user with designation, skill_level, interests
+- GET /users/{id} — get user profile
+- Generate user profile embedding from their interests
+
+**Phase 5 — LLM Summarization**
+- Write summarizer.py using OpenAI API
+- For each paper, generate: 1-min summary, 5-min breakdown, deep dive, build ideas, suggested stack, difficulty score, estimated build time
+- Prompts should be role-aware (adjusted based on user's designation and skill level)
+- Cache results back to PostgreSQL (don't re-summarize same paper twice)
+
+**Phase 6 — Personalized Feed**
+- GET /feed/{user_id} endpoint
+- Fetch user profile → generate profile embedding
+- Search Qdrant for top N most similar paper embeddings
+- Return those papers with their summaries
+- This is the core RAG flow
+
+**Phase 7 — Connect Feature**
+- POST /connect/interest — user marks interest in a paper/project
+- GET /connect/paper/{paper_id} — see all users interested in same paper
+- POST /connect/request — send collaboration request to another user
+- Basic matching logic
+
+**Phase 8 — Frontend (Next.js)**
+- Initialize Next.js in /frontend folder
+- Pages: Home feed, Paper detail, User profile, Connect board
+- Call FastAPI backend via fetch/axios
+- Show multi-layer summaries in expandable UI
+- Profile setup flow on first login
+
+**Phase 9 — Additional Data Sources**
+- GitHub Trending scraper
+- Hacker News API integration
+- Product Hunt API integration
+- Unified feed combining all sources
+
+**Phase 10 — Polish + Deployment**
+- Deploy backend on Railway or Render
+- Deploy frontend on Vercel
+- Set up daily cron job for auto-ingestion
+- Add Redis caching for summaries (optional)
+
+---
+
+**IMPORTANT NOTES FOR CONTINUATION:**
+- Windows machine, use PowerShell-compatible commands (New-Item instead of touch, etc.)
+- Virtual environment is at backend/venv, activate with: `venv\Scripts\activate`
+- Run server from backend/ folder: `uvicorn app.main:app --reload`
+- Supabase connection uses session pooler (port 5432), not direct connection (IPv4 issue)
+- Password must have no special characters like # in .env (or URL-encode them)
+- OpenAI API key is set, Anthropic key is blank
+- All imports use `app.` prefix (e.g. `from app.db.database import Base`)
+- The /create-tables debug route exists at GET /create-tables
+
+---
+
+Paste this entire block into a new chat and the assistant will have full context to continue exactly where you left off.
