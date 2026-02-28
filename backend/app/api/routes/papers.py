@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models import Paper
 from app.ingestion.arxiv_fetcher import fetch_papers
+from app.ai.embedder import embed_and_store
 
 router = APIRouter()
 
@@ -24,7 +25,6 @@ async def ingest_papers(field: str, db: Session = Depends(get_db)):
     skipped = 0
     
     for p in papers_data:
-        # Check for duplicate
         existing = db.query(Paper).filter(Paper.arxiv_id == p["arxiv_id"]).first()
         if existing:
             skipped += 1
@@ -40,6 +40,10 @@ async def ingest_papers(field: str, db: Session = Depends(get_db)):
             field=field,
         )
         db.add(paper)
+        db.flush()  # gets paper.id before commit
+
+        embedding_id = embed_and_store(str(paper.id), p["title"], p["abstract"])
+        paper.embedding_id = embedding_id
         added += 1
     
     db.commit()
