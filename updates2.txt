@@ -177,12 +177,19 @@ Phase 4 🔲 — User Profile System (NEXT)
   User interests stored as array in PostgreSQL
   User profile embedding generated from interests (for Phase 6)
 
-Phase 5 🔲 — LLM Summarization
+Phase 5 🔲 — LLM Summarization + Project Idea Generation
   summarizer.py using OpenAI API
-  For each paper: 1-min summary, 5-min breakdown, deep dive,
-  build ideas, suggested stack, difficulty score, estimated build time
+  Two core functions:
+  1. summarize_paper(paper, user) — for each paper: 1-min summary, 5-min
+     breakdown, deep dive, build ideas derived from the paper, suggested
+     stack, difficulty score, estimated build time
+  2. generate_project_ideas(interest, user) — pure LLM call with optional
+     web search to generate fresh project ideas for a given interest domain,
+     not tied to any specific paper (e.g. "give me 5 buildable projects for
+     a college student interested in mental health + AI")
   Prompts are role-aware (adjusted by designation + skill level)
   Results cached in PostgreSQL (never re-summarize same paper twice)
+  Feed is a mix of paper-derived ideas AND freshly LLM-generated ones
 
 Phase 6 🔲 — Personalized Feed (CORE FEATURE)
   GET /feed/{user_id}
