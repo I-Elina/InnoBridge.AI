@@ -1,14 +1,16 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://user:password@localhost/innovate_db"
+    DATABASE_URL: str = ""
     QDRANT_URL: str = "http://localhost:6333"
     QDRANT_COLLECTION: str = "papers"
-    LLM_PROVIDER: str = "openai"  # swap to "anthropic" anytime
+    LLM_PROVIDER: str = "groq"  # swap to "anthropic" anytime
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
+    GROQ_API_KEY: str = ""              # ← add this line
+    NEWSAPI_KEY: str = ""
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"  # free, local, good enough
-    QDRANT_API_KEY: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.yLgnzA5T2qNBA8otxkqavCHFOovuBMC1i4m9BH7AWJQ"
+    QDRANT_API_KEY: str = ""
     class Config:
         env_file = ".env"
 
