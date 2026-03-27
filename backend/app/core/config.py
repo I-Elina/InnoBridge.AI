@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
+
     DATABASE_URL: str = ""
     QDRANT_URL: str = "http://localhost:6333"
     QDRANT_COLLECTION: str = "papers"
@@ -13,5 +14,8 @@ class Settings(BaseSettings):
     QDRANT_API_KEY: str = ""
     class Config:
         env_file = ".env"
+        extra: "allow"
+    
+
 
 settings = Settings()

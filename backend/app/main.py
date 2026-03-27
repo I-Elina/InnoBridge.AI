@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import papers, users, feed
+from app.api.routes import papers, users, feed , connect
 from app.db.database import Base, engine
 from app.db import models  # add this line
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,6 +21,7 @@ app.add_middleware(
 app.include_router(papers.router, prefix="/papers", tags=["papers"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(feed.router, prefix="/feed", tags=["feed"])
+app.include_router(connect.router, prefix="/connect", tags=["connect"])
 
 @app.get("/")
 def root():
