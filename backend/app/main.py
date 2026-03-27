@@ -7,7 +7,7 @@ from app.db import models  # add this line
 Base.metadata.create_all(bind=engine)
 
 
-app = FastAPI(title="InnovateFeed API", version="1.0.0")
+app = FastAPI(title="InnoBridge.AI", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,7 +23,7 @@ app.include_router(feed.router, prefix="/feed", tags=["feed"])
 
 @app.get("/")
 def root():
-    return {"status": "InnovateFeed API is running"}
+    return {"status": "InnoBridge.AI API is running"}
 
 @app.get("/create-tables")
 def create_tables():
