@@ -1,0 +1,12 @@
+# Ignore node dependencies
+node_modules/
+
+# Ignore zip files
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Optional: logs
+npm-debug.log*
